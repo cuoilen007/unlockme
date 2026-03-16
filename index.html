@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Unlock My Heart</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#fff5f8;
+text-align:center;
+}
+
+.container{
+width:700px;
+margin:auto;
+padding:30px;
+}
+
+h1{
+color:#ff6fa5;
+}
+
+button{
+padding:12px 20px;
+border:none;
+background:#ff6fa5;
+color:white;
+border-radius:10px;
+cursor:pointer;
+margin-top:10px;
+}
+
+.quest{
+background:white;
+padding:20px;
+margin-top:20px;
+border-radius:10px;
+}
+
+.map{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin-top:20px;
+}
+
+.node{
+padding:20px;
+background:white;
+border-radius:12px;
+cursor:pointer;
+}
+
+.locked{
+opacity:0.4;
+}
+
+.memory{
+background:#ffe8f0;
+padding:20px;
+margin-top:20px;
+border-radius:10px;
+}
+
+.timer{
+color:#ff6fa5;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+
+<body>
+
+<div class="container">
+
+<h1>💌 Unlock My Heart</h1>
+
+<div id="game"></div>
+
+</div>
+
+<script>
+
+let quest = Number(localStorage.getItem("quest")) || 1
+let unlock = Number(localStorage.getItem("unlock")) || 0
+
+intro()
+
+function intro(){
+
+document.getElementById("game").innerHTML = `
+
+<div class="quest">
+
+<h2>⚠ Warning</h2>
+
+<p>This game contains:</p>
+
+<p>• emotional damage</p>
+<p>• overthinking</p>
+<p>• possible rejection</p>
+
+<p>Only play if you really like me.</p>
+
+<button onclick="startGame()">Continue anyway</button>
+
+</div>
+
+`
+
+}
+
+function startGame(){
+renderMap()
+}
+
+function renderMap(){
+
+let map = `
+
+<div class="map">
+
+${node(1,"📖 Quiz")}
+${node(2,"🧩 Puzzle")}
+${node(3,"📷 Memory")}
+${node(4,"⏳ Surprise")}
+${node(5,"💌 100 Reasons")}
+
+</div>
+
+<div id="timer"></div>
+
+`
+
+document.getElementById("game").innerHTML = map
+
+showTimer()
+
+}
+
+function node(id,name){
+
+if(id < quest){
+return `<div class="node">✔ ${name}</div>`
+}
+
+if(id == quest){
+
+if(Date.now() < unlock){
+return `<div class="node locked">${name}</div>`
+}
+
+return `<div class="node" onclick="openQuest(${id})">${name}</div>`
+}
+
+return `<div class="node locked">${name}</div>`
+
+}
+
+function openQuest(id){
+
+if(id==1) quest1()
+if(id==2) quest2()
+if(id==3) quest3()
+if(id==4) quest4()
+if(id==5) quest5()
+
+}
+
+function completeQuest(){
+
+quest++
+
+localStorage.setItem("quest",quest)
+
+let next = Date.now() + 86400000
+localStorage.setItem("unlock",next)
+
+showMemory()
+
+}
+
+function showMemory(){
+
+let memories = {
+
+2:`Memory Unlocked
+
+Chị vẫn nhớ lần đầu
+chúng ta nói chuyện khá lâu.
+
+Lúc đó chị nghĩ
+em khá dễ thương.`,
+
+3:`Memory Unlocked
+
+Hôm đó em làm chị cười rất nhiều.
+
+Chị không nói thôi,
+nhưng chị nhớ.`,
+
+4:`Memory Unlocked
+
+Chị bắt đầu tự hỏi
+tại sao em lại kiên nhẫn vậy.`,
+
+5:`Memory Unlocked
+
+Chị bắt đầu nghĩ…
+
+maybe em thật sự nghiêm túc.`,
+
+6:`Memory Unlocked
+
+Em đã đi đến đây rồi.
+
+Chị khá tò mò
+em sẽ nói gì tiếp theo.`
+
+}
+
+document.getElementById("game").innerHTML = `
+
+<div class="memory">
+${memories[quest]}
+</div>
+
+<button onclick="renderMap()">Back to Map</button>
+
+`
+
+}
+
+function quest1(){
+
+document.getElementById("game").innerHTML=`
+
+<div class="quest">
+
+<h2>Quest 1</h2>
+
+<p>Món tôi thích nhất?</p>
+
+<button onclick="check(true)">Trà Nhãn Lài</button>
+<button onclick="check(false)">Trà sữa</button>
+
+<p>Tôi ghét điều gì nhất?</p>
+
+<button onclick="check(true)">Người nói dối</button>
+<button onclick="check(false)">Người im lặng</button>
+
+</div>
+
+`
+
+}
+
+function check(correct){
+
+if(correct){
+completeQuest()
+}else{
+alert("Sai rồi 😏")
+}
+
+}
+
+function quest2(){
+
+document.getElementById("game").innerHTML=`
+
+<div class="quest">
+
+<h2>Quest 2</h2>
+
+<p>Decode:</p>
+
+<p>3-1-9  3-1-25  4-1-21  18-15-9</p>
+
+<input id="puzzle">
+
+<button onclick="checkPuzzle()">Submit</button>
+
+</div>
+
+`
+
+}
+
+function checkPuzzle(){
+
+let ans = document.getElementById("puzzle").value.toLowerCase()
+
+if(ans.includes("cái cây đâu rồi")){
+completeQuest()
+}else{
+alert("Sai rồi")
+}
+
+}
+
+function quest3(){
+
+document.getElementById("game").innerHTML=`
+
+<div class="quest">
+
+<h2>Quest 3</h2>
+
+<p>Chụp ảnh ở 3 nơi
+chúng ta từng gặp nhau.</p>
+
+<p>Upload story rồi quay lại.</p>
+
+<button onclick="completeQuest()">Tôi đã đăng story</button>
+
+</div>
+
+`
+
+}
+
+function quest4(){
+
+document.getElementById("game").innerHTML=`
+
+<div class="quest">
+
+<h2>Quest 4</h2>
+
+<p>Chị có một bất ngờ cho em.</p>
+
+<p>Sau khi tìm thấy
+hãy quay lại đây.</p>
+
+<button onclick="completeQuest()">Tôi đã tìm thấy</button>
+
+</div>
+
+`
+
+}
+
+function quest5(){
+
+document.getElementById("game").innerHTML=`
+
+<div class="quest">
+
+<h2>Quest 5</h2>
+
+<p>Viết 100 lý do vì sao em thích chị.</p>
+
+<textarea id="reasons" rows="6" style="width:90%"></textarea>
+
+<button onclick="checkReasons()">Submit</button>
+
+</div>
+
+`
+
+}
+
+function checkReasons(){
+
+let text=document.getElementById("reasons").value
+let words=text.split(" ")
+
+if(words.length<1){
+alert("Chưa đủ 100 lý do 😏")
+return
+}
+
+secretEnding()
+
+}
+
+function secretEnding(){
+
+document.getElementById("game").innerHTML=`
+
+<div class="quest">
+
+<h2>🔐 Secret Ending Unlocked</h2>
+
+<p>You really tried.</p>
+
+<p>That means something.</p>
+
+<p>Chị thấy em đã cố gắng rất nhiều
+để đi đến bước này.</p>
+
+<p>Không phải ai cũng đủ kiên nhẫn
+để làm hết những điều này.</p>
+
+<p>Maybe…
+em thực sự nghiêm túc.</p>
+
+<p>Và chị rất trân trọng điều đó.</p>
+
+<p>So…</p>
+
+<button onclick="confession()">❤️ CONFESS</button>
+
+</div>
+
+`
+
+}
+
+function confession(){
+
+document.getElementById("game").innerHTML=`
+
+<div class="quest">
+
+<h2>Confession</h2>
+
+<textarea rows="6" style="width:90%"></textarea>
+
+<p>Confession received.</p>
+
+<p>Now chị sẽ suy nghĩ về nó.</p>
+
+</div>
+
+`
+
+}
+
+function showTimer(){
+
+let unlock = Number(localStorage.getItem("unlock"))
+
+if(!unlock) return
+
+setInterval(()=>{
+
+let diff = unlock - Date.now()
+
+if(diff <=0) return
+
+let h = Math.floor(diff/1000/60/60)
+let m = Math.floor(diff/1000/60 % 60)
+
+document.getElementById("timer").innerHTML =
+"Next quest unlock in "+h+"h "+m+"m"
+
+},1000)
+
+}
+
+</script>
+
+</body>
+</html>
