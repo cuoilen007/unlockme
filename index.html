@@ -1,26 +1,24 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <meta charset="UTF-8">
 <title>Unlock My Heart</title>
 
 <style>
 
 body{
-margin:0;
 font-family:Arial;
 background:#fff5f8;
+margin:0;
 text-align:center;
 }
 
 .container{
 width:700px;
 margin:auto;
-padding:30px;
-}
-
-h1{
-color:#ff6fa5;
+padding:40px;
 }
 
 button{
@@ -33,48 +31,42 @@ cursor:pointer;
 margin-top:10px;
 }
 
-.quest{
-background:white;
-padding:20px;
-margin-top:20px;
-border-radius:10px;
-}
-
-.map{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:15px;
-margin-top:20px;
-}
-
 .node{
-padding:20px;
 background:white;
-border-radius:12px;
+padding:20px;
+margin:10px;
+border-radius:10px;
 cursor:pointer;
 }
 
 .locked{
 opacity:0.4;
+cursor:not-allowed;
+}
+
+.quest{
+background:white;
+padding:25px;
+border-radius:12px;
+margin-top:20px;
 }
 
 .memory{
 background:#ffe8f0;
 padding:20px;
+border-radius:12px;
 margin-top:20px;
-border-radius:10px;
 }
 
-.timer{
-color:#ff6fa5;
-margin-top:10px;
+textarea{
+width:90%;
+padding:10px;
+border-radius:8px;
 }
 
 </style>
-</head>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+</head>
 
 <body>
 
@@ -95,72 +87,64 @@ intro()
 
 function intro(){
 
-document.getElementById("game").innerHTML = `
+document.getElementById("game").innerHTML=`
 
 <div class="quest">
 
 <h2>⚠ Warning</h2>
 
 <p>This game contains:</p>
-
 <p>• emotional damage</p>
 <p>• overthinking</p>
 <p>• possible rejection</p>
 
-<p>Only play if you really like me.</p>
-
-<button onclick="startGame()">Continue anyway</button>
+<button onclick="renderMap()">Continue</button>
 
 </div>
 
 `
 
-}
-
-function startGame(){
-renderMap()
 }
 
 function renderMap(){
 
-let map = `
+let html=""
 
-<div class="map">
+for(let i=1;i<=5;i++){
 
-${node(1,"📖 Quiz")}
-${node(2,"🧩 Puzzle")}
-${node(3,"📷 Memory")}
-${node(4,"⏳ Surprise")}
-${node(5,"💌 100 Reasons")}
+if(i<quest){
 
-</div>
-
-<div id="timer"></div>
-
-`
-
-document.getElementById("game").innerHTML = map
-
-showTimer()
+html+=`<div class="node">✔ Quest ${i}</div>`
 
 }
 
-function node(id,name){
+else if(i==quest){
 
-if(id < quest){
-return `<div class="node">✔ ${name}</div>`
+if(Date.now()<unlock){
+
+html+=`<div class="node locked">Quest ${i}</div>`
+
+}else{
+
+html+=`<div class="node" onclick="openQuest(${i})">Quest ${i}</div>`
+
 }
 
-if(id == quest){
-
-if(Date.now() < unlock){
-return `<div class="node locked">${name}</div>`
 }
 
-return `<div class="node" onclick="openQuest(${id})">${name}</div>`
+else{
+
+html+=`<div class="node locked">Quest ${i}</div>`
+
 }
 
-return `<div class="node locked">${name}</div>`
+}
+
+html+=`<div id="timer"></div>`
+
+document.getElementById("game").innerHTML=html
+
+timer()
 
 }
 
@@ -180,8 +164,11 @@ quest++
 
 localStorage.setItem("quest",quest)
 
-let next = Date.now() + 86400000
+let next=Date.now()+86400000
+
 localStorage.setItem("unlock",next)
+
+unlock=next
 
 showMemory()
 
@@ -189,15 +176,14 @@ showMemory()
 
 function showMemory(){
 
-let memories = {
+let memories={
 
 2:`Memory Unlocked
 
-Chị vẫn nhớ lần đầu
-chúng ta nói chuyện khá lâu.
+Chị không nghĩ
+em lại nhớ mấy chi tiết nhỏ này.
 
-Lúc đó chị nghĩ
-em khá dễ thương.`,
+Có vẻ em cũng để ý chị thật.`,
 
 3:`Memory Unlocked
 
@@ -209,13 +195,11 @@ nhưng chị nhớ.`,
 4:`Memory Unlocked
 
 Chị bắt đầu tự hỏi
-tại sao em lại kiên nhẫn vậy.`,
+tại sao em kiên nhẫn vậy.`,
 
 5:`Memory Unlocked
 
-Chị bắt đầu nghĩ…
-
-maybe em thật sự nghiêm túc.`,
+Maybe em thật sự nghiêm túc.`,
 
 6:`Memory Unlocked
 
@@ -226,13 +210,15 @@ em sẽ nói gì tiếp theo.`
 
 }
 
-document.getElementById("game").innerHTML = `
+document.getElementById("game").innerHTML=`
 
 <div class="memory">
+
 ${memories[quest]}
+
 </div>
 
-<button onclick="renderMap()">Back to Map</button>
+<button onclick="renderMap()">Back to map</button>
 
 `
 
@@ -244,17 +230,43 @@ document.getElementById("game").innerHTML=`
 
 <div class="quest">
 
-<h2>Quest 1</h2>
+<h2>Quest 1 — Bạn hiểu tôi đến đâu?</h2>
 
-<p>Món tôi thích nhất?</p>
+<form id="quiz">
 
-<button onclick="check(true)">Trà Nhãn Lài</button>
-<button onclick="check(false)">Trà sữa</button>
+<p>1. Món tôi thích nhất?</p>
 
-<p>Tôi ghét điều gì nhất?</p>
+<label><input type="radio" name="q1" value="0"> Bạc Xỉu muối</label><br>
+<label><input type="radio" name="q1" value="0"> Cà phê muối</label><br>
+<label><input type="radio" name="q1" value="0"> Trà sữa</label><br>
+<label><input type="radio" name="q1" value="1"> Trà Nhãn Lài</label>
 
-<button onclick="check(true)">Người nói dối</button>
-<button onclick="check(false)">Người im lặng</button>
+<p>2. Tôi ghét điều gì nhất?</p>
+
+<label><input type="radio" name="q2" value="0"> Bị trễ giờ</label><br>
+<label><input type="radio" name="q2" value="1"> Người nói dối</label><br>
+<label><input type="radio" name="q2" value="0"> Người im lặng</label><br>
+<label><input type="radio" name="q2" value="0"> Người EQ thấp</label>
+
+<p>3. Tôi thích đi đâu nhất?</p>
+
+<label><input type="radio" name="q3" value="0"> Cafe</label><br>
+<label><input type="radio" name="q3" value="0"> Đi Mall</label><br>
+<label><input type="radio" name="q3" value="0"> Du lịch</label><br>
+<label><input type="radio" name="q3" value="1"> Nhà</label>
+
+<p>4. Tôi thường ngủ lúc mấy giờ?</p>
+
+<label><input type="radio" name="q4" value="0"> 24:00</label><br>
+<label><input type="radio" name="q4" value="0"> 01:00</label><br>
+<label><input type="radio" name="q4" value="1"> 02:00</label><br>
+<label><input type="radio" name="q4" value="0"> 03:00</label>
+
+<br><br>
+
+<button type="button" onclick="checkQuiz()">Submit</button>
+
+</form>
 
 </div>
 
@@ -262,12 +274,43 @@ document.getElementById("game").innerHTML=`
 
 }
 
-function check(correct){
+function checkQuiz(){
 
-if(correct){
+let q1=document.querySelector('input[name="q1"]:checked')
+let q2=document.querySelector('input[name="q2"]:checked')
+let q3=document.querySelector('input[name="q3"]:checked')
+let q4=document.querySelector('input[name="q4"]:checked')
+
+if(!q1||!q2||!q3||!q4){
+
+alert("Hãy trả lời tất cả câu hỏi")
+
+return
+
+}
+
+let score=
+Number(q1.value)+
+Number(q2.value)+
+Number(q3.value)+
+Number(q4.value)
+
+if(score===4){
+
 completeQuest()
+
 }else{
-alert("Sai rồi 😏")
+
+alert("Sai rồi 😏 Hãy thử lại sau 24h")
+
+let next=Date.now()+86400000
+
+localStorage.setItem("unlock",next)
+
+unlock=next
+
+renderMap()
+
 }
 
 }
@@ -282,9 +325,9 @@ document.getElementById("game").innerHTML=`
 
 <p>Decode:</p>
 
-<p>3-1-9  3-1-25  4-1-21  18-15-9</p>
+<p>3-1-9 3-1-25 4-1-21 18-15-9</p>
 
-<input id="puzzle">
+<input id="ans">
 
 <button onclick="checkPuzzle()">Submit</button>
 
@@ -296,12 +339,16 @@ document.getElementById("game").innerHTML=`
 
 function checkPuzzle(){
 
-let ans = document.getElementById("puzzle").value.toLowerCase()
+let v=document.getElementById("ans").value.toLowerCase()
 
-if(ans.includes("cái cây đâu rồi")){
+if(v.includes("cái cây đâu rồi")){
+
 completeQuest()
+
 }else{
+
 alert("Sai rồi")
+
 }
 
 }
@@ -314,10 +361,7 @@ document.getElementById("game").innerHTML=`
 
 <h2>Quest 3</h2>
 
-<p>Chụp ảnh ở 3 nơi
-chúng ta từng gặp nhau.</p>
-
-<p>Upload story rồi quay lại.</p>
+<p>Chụp ảnh 3 nơi chúng ta từng gặp nhau.</p>
 
 <button onclick="completeQuest()">Tôi đã đăng story</button>
 
@@ -335,12 +379,9 @@ document.getElementById("game").innerHTML=`
 
 <h2>Quest 4</h2>
 
-<p>Chị có một bất ngờ cho em.</p>
+<p>Tạo một bất ngờ rồi quay lại đây.</p>
 
-<p>Sau khi tìm thấy
-hãy quay lại đây.</p>
-
-<button onclick="completeQuest()">Tôi đã tìm thấy</button>
+<button onclick="completeQuest()">Done</button>
 
 </div>
 
@@ -356,9 +397,9 @@ document.getElementById("game").innerHTML=`
 
 <h2>Quest 5</h2>
 
-<p>Viết 100 lý do vì sao em thích chị.</p>
+<p>Viết 100 lý do em thích chị.</p>
 
-<textarea id="reasons" rows="6" style="width:90%"></textarea>
+<textarea id="reason" rows="6"></textarea>
 
 <button onclick="checkReasons()">Submit</button>
 
@@ -370,44 +411,37 @@ document.getElementById("game").innerHTML=`
 
 function checkReasons(){
 
-let text=document.getElementById("reasons").value
-let words=text.split(" ")
+let text=document.getElementById("reason").value
 
-if(words.length<1){
+if(text.split(" ").length<100){
+
 alert("Chưa đủ 100 lý do 😏")
+
 return
-}
-
-secretEnding()
 
 }
 
-function secretEnding(){
+ending()
+
+}
+
+function ending(){
 
 document.getElementById("game").innerHTML=`
 
 <div class="quest">
 
-<h2>🔐 Secret Ending Unlocked</h2>
+<h2>🔐 Secret Ending</h2>
 
 <p>You really tried.</p>
 
 <p>That means something.</p>
 
-<p>Chị thấy em đã cố gắng rất nhiều
-để đi đến bước này.</p>
+<p>Chị thấy em đã cố gắng rất nhiều.</p>
 
-<p>Không phải ai cũng đủ kiên nhẫn
-để làm hết những điều này.</p>
+<p>Hãy gửi kết quả cho chị qua Zalo.</p>
 
-<p>Maybe…
-em thực sự nghiêm túc.</p>
-
-<p>Và chị rất trân trọng điều đó.</p>
-
-<p>So…</p>
-
-<button onclick="confession()">❤️ CONFESS</button>
+<button onclick="send()">Gửi kết quả</button>
 
 </div>
 
@@ -415,43 +449,28 @@ em thực sự nghiêm túc.</p>
 
 }
 
-function confession(){
+function send(){
 
-document.getElementById("game").innerHTML=`
-
-<div class="quest">
-
-<h2>Confession</h2>
-
-<textarea rows="6" style="width:90%"></textarea>
-
-<p>Confession received.</p>
-
-<p>Now chị sẽ suy nghĩ về nó.</p>
-
-</div>
-
-`
+window.open("https://zalo.me")
 
 }
 
-function showTimer(){
-
-let unlock = Number(localStorage.getItem("unlock"))
-
-if(!unlock) return
+function timer(){
 
 setInterval(()=>{
 
-let diff = unlock - Date.now()
+if(!unlock) return
 
-if(diff <=0) return
+let diff=unlock-Date.now()
 
-let h = Math.floor(diff/1000/60/60)
-let m = Math.floor(diff/1000/60 % 60)
+if(diff<=0) return
 
-document.getElementById("timer").innerHTML =
-"Next quest unlock in "+h+"h "+m+"m"
+let h=Math.floor(diff/1000/60/60)
+let m=Math.floor(diff/1000/60%60)
+
+document.getElementById("timer").innerHTML=
+
+"Quest tiếp theo mở sau "+h+"h "+m+"m"
 
 },1000)
 
