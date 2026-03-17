@@ -361,7 +361,7 @@ document.getElementById("game").innerHTML=`
 
 <h2>Quest 3</h2>
 
-<p>Chụp ảnh 3 nơi chúng ta từng gặp nhau.</p>
+<p>Chụp ảnh 3 nơi chúng ta từng gặp nhau và đăng story.</p>
 
 <button onclick="completeQuest()">Tôi đã đăng story</button>
 
@@ -379,7 +379,7 @@ document.getElementById("game").innerHTML=`
 
 <h2>Quest 4</h2>
 
-<p>Tạo một bất ngờ rồi quay lại đây.</p>
+<p>Tạo một bất ngờ thật lớn cho chị rồi quay lại đây.</p>
 
 <button onclick="completeQuest()">Done</button>
 
@@ -397,11 +397,9 @@ document.getElementById("game").innerHTML=`
 
 <h2>Quest 5</h2>
 
-<p>Viết 100 lý do em thích chị.</p>
+<p>Viết 100 lý do em thích chị qua zalo.</p>
 
-<textarea id="reason" rows="6"></textarea>
-
-<button onclick="checkReasons()">Submit</button>
+<button onclick="checkReasons()">Em đã gửi</button>
 
 </div>
 
@@ -411,15 +409,6 @@ document.getElementById("game").innerHTML=`
 
 function checkReasons(){
 
-let text=document.getElementById("reason").value
-
-if(text.split(" ").length<100){
-
-alert("Chưa đủ 100 lý do 😏")
-
-return
-
-}
 
 ending()
 
@@ -439,9 +428,14 @@ document.getElementById("game").innerHTML=`
 
 <p>Chị thấy em đã cố gắng rất nhiều.</p>
 
-<p>Hãy gửi kết quả cho chị qua Zalo.</p>
+<p>Chị nghĩ cũng đã đủ để mình bước sang một chặng đường mới với đầy đủ ý nghĩa của nó.</p>
 
-<button onclick="send()">Gửi kết quả</button>
+<p>Chị không hứa sẽ trở thành một người thật hoàn hảo nhưng chị sẽ cố gắng thay đổi phù hợp cho một chặng đường thật dài, thật đong đầy.</p>
+
+<p>Cám ơn em đã xuất hiện.</p>
+
+<p>Giờ thì em có thể làm gì đó để nhận được câu đồng ý rồi.</p>
+
 
 </div>
 
@@ -449,11 +443,6 @@ document.getElementById("game").innerHTML=`
 
 }
 
-function send(){
-
-window.open("https://zalo.me")
-
-}
 
 function timer(){
 
