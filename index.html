@@ -81,7 +81,8 @@ border-radius:8px;
 <script>
 
 let quest = Number(localStorage.getItem("quest")) || 1
-let unlock = Number(localStorage.getItem("unlock")) || 0
+//let unlock = Number(localStorage.getItem("unlock")) || 0
+let unlock = 1
 
 intro()
 
@@ -164,7 +165,7 @@ quest++
 
 localStorage.setItem("quest",quest)
 
-let next=Date.now()+72000000
+let next=Date.now()+000000
 
 localStorage.setItem("unlock",next)
 
@@ -452,7 +453,7 @@ if(!unlock) return
 
 let diff=unlock-Date.now()
 
-if(diff>=0) return
+//if(diff<=0) return
 
 let h=Math.floor(diff/1000/60/60)
 let m=Math.floor(diff/1000/60%60)
